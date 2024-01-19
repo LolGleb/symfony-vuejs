@@ -3,16 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Form\EditProductFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends AbstractController
 {
-
     private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -25,7 +27,8 @@ class DefaultController extends AbstractController
     {
         $entityManager = $this->entityManager;
         $productList = $entityManager->getRepository(Product::class)->findAll();
-//        dd($productList);
+
+        //        dd($productList);
         return $this->render('main/default/index.html.twig', []);
     }
 
@@ -55,20 +58,19 @@ class DefaultController extends AbstractController
         } else {
             $product = new Product();
         }
-        $form = $this->createFormBuilder($product)
-        ->add('title', TextType::class)
-        ->getForm();
-//        dump($product->getTitle());
+        $form = $this->createForm(EditProductFormType::class, $product);
+        //        dump($product->getTitle());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-//            dd($data);
+            //            dd($data);
             $entityManager->persist($product);
             $entityManager->flush();
 
             return $this->redirectToRoute('product_edit', ['id' => $product->getId()]);
         }
-//        dd($product, $form);
+
+        //        dd($product, $form);
         return $this->render('main/default/product_edit.html.twig', ['form' => $form->createView()]);
     }
 }

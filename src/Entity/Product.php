@@ -51,7 +51,7 @@ class Product
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(string $title = null): static
     {
         $this->title = $title;
 
